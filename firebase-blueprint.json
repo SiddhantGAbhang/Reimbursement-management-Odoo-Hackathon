@@ -1,0 +1,91 @@
+{
+  "entities": {
+    "companies": {
+      "title": "Company",
+      "description": "Represents a company using the reimbursement system.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "country": { "type": "string" },
+        "currency": { "type": "string" },
+        "adminId": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name", "country", "currency", "adminId"]
+    },
+    "users": {
+      "title": "User",
+      "description": "Represents a user (Employee, Manager, Admin) in the system.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "email": { "type": "string" },
+        "displayName": { "type": "string" },
+        "role": { "type": "string", "enum": ["admin", "manager", "employee"] },
+        "companyId": { "type": "string" },
+        "managerId": { "type": "string", "description": "The direct manager of the user." },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "email", "role", "companyId"]
+    },
+    "expenses": {
+      "title": "Expense",
+      "description": "Represents a reimbursement claim.",
+      "type": "object",
+      "properties": {
+        "employeeId": { "type": "string" },
+        "companyId": { "type": "string" },
+        "amount": { "type": "number" },
+        "currency": { "type": "string" },
+        "convertedAmount": { "type": "number", "description": "Amount in company's base currency." },
+        "category": { "type": "string" },
+        "description": { "type": "string" },
+        "date": { "type": "string", "format": "date" },
+        "receiptUrl": { "type": "string" },
+        "status": { "type": "string", "enum": ["pending", "approved", "rejected"] },
+        "currentApproverStep": { "type": "integer" },
+        "approvals": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "approverId": { "type": "string" },
+              "status": { "type": "string", "enum": ["approved", "rejected"] },
+              "comment": { "type": "string" },
+              "timestamp": { "type": "string", "format": "date-time" }
+            }
+          }
+        },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["employeeId", "companyId", "amount", "currency", "status"]
+    },
+    "approvalRules": {
+      "title": "Approval Rule",
+      "description": "Defines the approval workflow for a company.",
+      "type": "object",
+      "properties": {
+        "companyId": { "type": "string" },
+        "isManagerApprover": { "type": "boolean", "description": "If true, the direct manager is the first step." },
+        "steps": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "type": { "type": "string", "enum": ["specific_user", "percentage"] },
+              "userIds": { "type": "array", "items": { "type": "string" } },
+              "percentage": { "type": "number", "description": "Required percentage for approval." }
+            }
+          }
+        }
+      },
+      "required": ["companyId"]
+    }
+  },
+  "firestore": {
+    "/companies/{companyId}": { "schema": "companies", "description": "Company data." },
+    "/users/{userId}": { "schema": "users", "description": "User profiles." },
+    "/expenses/{expenseId}": { "schema": "expenses", "description": "Expense claims." },
+    "/approvalRules/{ruleId}": { "schema": "approvalRules", "description": "Company approval workflows." }
+  }
+}

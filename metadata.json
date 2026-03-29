@@ -1,0 +1,8 @@
+{
+  "name": "Odoo Exp - Smart Reimbursement Management",
+  "description": "An AI-powered reimbursement management system with OCR receipt scanning, multi-level approval workflows, and real-time currency conversion.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}
